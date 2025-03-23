@@ -51,14 +51,5 @@ To make changes:
 
 ## Deployment
 
-For production deployment, consider:
-
-- Using a reverse proxy like Nginx or Traefik
-- Setting up SSL certificates for HTTPS
-- Using Docker Compose for easier management
-
-Example command for production deployment with a specific port:
-
-```bash
-docker run -d --restart unless-stopped -p 80:80 seattle-ai-society
-```
+Hosted on Render.com.
+Deployed automatically on Github update.
