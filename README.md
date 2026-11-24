@@ -1,6 +1,6 @@
 # Seattle AI Society Website
 
-This repository contains the Seattle AI Society website files and Docker configuration for easy deployment.
+This repository contains the Seattle AI Society website files.
 
 ## Structure
 
@@ -10,8 +10,7 @@ This repository contains the Seattle AI Society website files and Docker configu
   - `get-involved.html` - Get Involved page
   - `files/` - Static assets (images, CSS, JS)
 
-- `nginx.conf` - Nginx configuration for URL routing
-- `Dockerfile` - Docker container configuration
+- `nginx.conf`, `Dockerfile` - Legacy Docker/nginx setup from the Render deployment (still works for local preview)
 
 ## URL Structure
 
@@ -21,35 +20,39 @@ The website is configured with clean URLs:
 - `/about` - About page
 - `/get-involved` - Get Involved page
 
-## Building and Running
+## Building
 
-### Prerequisites
-
-- Docker installed on your system
-
-### Build the Docker Image
+The site is served from `dist/`, which is generated from `www/` (and git-ignored):
 
 ```bash
-docker build -t seattle-ai-society .
+wildpc program build seattleaisociety
 ```
 
-### Run the Container
+The build copies `www/` to `dist/`, moves `about.html` and `get-involved.html` to
+`about/index.html` and `get-involved/index.html` (so `/about` and `/get-involved`
+work as clean URLs), and rewrites `./files/` asset paths to `/files/` so they resolve
+from those subdirectories. The build command lives in the Wild PC program config
+(`~/.wildpc/programs/seattleaisociety.yaml`).
+
+To preview without Wild PC, the Docker setup still works:
 
 ```bash
-docker run -p 8080:80 seattle-ai-society
+docker build -t seattle-ai-society . && docker run -p 8080:80 seattle-ai-society
 ```
-
-After running these commands, the website will be available at http://localhost:8080
 
 ## Development
 
-To make changes:
-
 1. Edit files in the `www/` directory
-2. Rebuild the Docker image
-3. Run the container to test your changes
+2. Run `wildpc program build seattleaisociety`
+3. Check https://seattleaisociety.civil.payne.io (LAN) or https://www.seattleaisociety.org
+
+The gateway serves `dist/` in place, so a rebuild is live immediately — no restart.
 
 ## Deployment
 
-Hosted on Render.com.
-Deployed automatically on Github update.
+Hosted on Wild PC (node `civil`) as the static deployment `seattleaisociety`
+(`~/.wildpc/deployments/statics/seattleaisociety.yaml`, `reach: public`,
+`public_host: www.seattleaisociety.org`). Caddy serves `dist/`, and the public
+hostname reaches it through the node's Cloudflare tunnel.
+
+Deploys are not automatic: pushing to GitHub does nothing. Rebuild on the node to publish.
